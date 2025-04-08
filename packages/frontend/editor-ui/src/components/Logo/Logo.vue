@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { FrontendSettings } from '@n8n/api-types';
-import { computed, onMounted, useCssModule, useTemplateRef } from 'vue';
+import { computed, onMounted, useCssModule } from 'vue';
 import { useFavicon } from '@vueuse/core';
 
-import LogoIcon from './logo-icon.svg';
-import LogoText from './logo-text.svg';
+import KalbeLogo from './Kalbe_Farma-full-putih.png';
 
 const props = defineProps<
 	(
@@ -22,11 +21,9 @@ const props = defineProps<
 
 const { location, releaseChannel } = props;
 
-const showLogoText = computed(() => {
-	if (location === 'authView') return true;
-	return !props.collapsed;
-});
-
+/**
+ * Hitung kumpulan kelas CSS berdasarkan lokasi dan status `collapsed`.
+ */
 const $style = useCssModule();
 const containerClasses = computed(() => {
 	if (location === 'authView') {
@@ -35,30 +32,24 @@ const containerClasses = computed(() => {
 	return [
 		$style.logoContainer,
 		$style.sidebar,
-		props.collapsed ? $style.sidebarCollapsed : $style.sidebarExpanded,
+		'collapsed' in props && props.collapsed ? $style.sidebarCollapsed : $style.sidebarExpanded,
 	];
 });
 
-const svg = useTemplateRef<{ $el: Element }>('logo');
+/**
+ * Opsional: jika bukan channel `stable`, ubah favicon menjadi PNG kita.
+ */
 onMounted(() => {
-	if (releaseChannel === 'stable' || !('createObjectURL' in URL)) return;
-
-	const logoEl = svg.value!.$el;
-
-	// Change the logo fill color inline, so that favicon can also use it
-	const logoColor = releaseChannel === 'dev' ? '#838383' : '#E9984B';
-	logoEl.querySelector('path')?.setAttribute('fill', logoColor);
-
-	// Reuse the SVG as favicon
-	const blob = new Blob([logoEl.outerHTML], { type: 'image/svg+xml' });
-	useFavicon(URL.createObjectURL(blob));
+	if (releaseChannel !== 'stable') {
+		useFavicon(KalbeLogo);
+	}
 });
 </script>
 
 <template>
 	<div :class="containerClasses" data-test-id="n8n-logo">
-		<LogoIcon ref="logo" :class="$style.logo" />
-		<LogoText v-if="showLogoText" :class="$style.logoText" />
+		<!-- Hanya menampilkan 1 file PNG -->
+		<img :src="KalbeLogo" :class="$style.logo" alt="Kalbe Logo" />
 		<slot />
 	</div>
 </template>
@@ -70,26 +61,19 @@ onMounted(() => {
 	align-items: center;
 }
 
-.logoText {
-	margin-left: var(--spacing-5xs);
-	path {
-		fill: var(--color-text-dark);
-	}
-}
-
+/**
+ * Logo lebih besar saat di authView
+ */
 .authView {
 	transform: scale(2);
 	margin-bottom: var(--spacing-xl);
 }
 
-.logo,
-.logoText {
+/**
+ * Logo di sidebar (baik collapsed maupun expanded)
+ */
+.logo {
 	transform: scale(1.3) translateY(-2px);
-}
-
-.logoText {
-	margin-left: var(--spacing-xs);
-	margin-right: var(--spacing-3xs);
 }
 
 .sidebarExpanded .logo {
