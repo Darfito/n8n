@@ -3,7 +3,7 @@ import type { FrontendSettings } from '@n8n/api-types';
 import { computed, onMounted, useCssModule } from 'vue';
 import { useFavicon } from '@vueuse/core';
 
-import KalbeLogo from './Kalbe_Farma-full-putih.png';
+import KalbeLogo from './kalbe-logo.png';
 
 const props = defineProps<
 	(
@@ -49,7 +49,11 @@ onMounted(() => {
 <template>
 	<div :class="containerClasses" data-test-id="n8n-logo">
 		<!-- Hanya menampilkan 1 file PNG -->
-		<img :src="KalbeLogo" :class="$style.logo" alt="Kalbe Logo" />
+		<img
+			:src="KalbeLogo"
+			:class="[$style.logo, location === 'authView' ? $style.authViewLogo : '']"
+			alt="Kalbe Logo"
+		/>
 		<slot />
 	</div>
 </template>
@@ -65,8 +69,12 @@ onMounted(() => {
  * Logo lebih besar saat di authView
  */
 .authView {
-	transform: scale(2);
-	margin-bottom: var(--spacing-xl);
+	img {
+		width: 90px;
+		height: auto;
+	}
+	transform: scale(1);
+	margin-bottom: var(--spacing-xs);
 }
 
 /**
