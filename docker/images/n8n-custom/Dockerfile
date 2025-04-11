@@ -6,6 +6,10 @@ FROM --platform=linux/amd64 n8nio/base:${NODE_VERSION} AS builder
 # Build the application from source
 WORKDIR /src
 COPY . /src
+
+# Tambahkan baris ini SEBELUM perintah "RUN pnpm build":
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store --mount=type=cache,id=pnpm-metadata,target=/root/.cache/pnpm/metadata DOCKER_BUILD=true pnpm install --frozen-lockfile
 RUN pnpm build
 
@@ -59,5 +63,6 @@ RUN \
 	chown node:node .n8n
 
 ENV SHELL /bin/sh
+RUN chmod +x /docker-entrypoint.sh
 USER node
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
