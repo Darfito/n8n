@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8n-custom:1.30.1
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      - NODE_FUNCTION_ALLOW_BUILTIN=*
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+    # The following lines replicate the behavior of -it --rm
+    # stdin_open: true # for -i
+    # tty: true        # for -t
+    # Docker Compose v2.x and later automatically remove anonymous volumes.
+    # For named volumes like 'n8n_data', removal is not default.
+    # If you truly want --rm behavior for the container (it will be removed on stop),
+    # you would typically manage this outside of the compose file for a persistent service.
+    # However, 'docker-compose down' will remove the container.
+
+volumes:
+  n8n_data:
+    # If n8n_data is a pre-existing named volume managed by Docker,
+    # you might want to declare it as external:
+    external: true
